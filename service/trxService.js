@@ -54,7 +54,9 @@ function sendTransaction(account_keystore, account_password, address_to, custom_
                     }else{
                         reject(receipt)
                     }
-                })
+                }).catch((err)=>{
+                reject(err);
+            })
             return signedHash
         })
     });
@@ -67,20 +69,7 @@ async function sendTx(custom_data){
 }
 
 function sendTxRepeat(custom_data){
-    let dfd = new Promise((resolve,reject)=>{
-        sendTx(custom_data).then((data)=>{
-            resolve(data)
-        }).catch(async (error)=>{
-            console.log(error)
-            //重试一次
-            await sendTx(custom_data).then((data)=>{
-                resolve(data)
-            }).catch((err)=>{
-                reject(err)
-            })
-        })
-    })
-    return dfd
+    return sendTx(custom_data)
 }
 function getTransaction(txHash) {
     console.log('getTransaction')
