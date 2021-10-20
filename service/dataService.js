@@ -30,7 +30,7 @@ function parsePhones(udeskCustomerInfo){
     let phones = ''
     if(udeskCustomerInfo) {
         udeskCustomerInfo = JSON.parse(udeskCustomerInfo)
-        udeskCustomerInfo.cellphones.map(item => item.content).join(',')
+        phones = udeskCustomerInfo.cellphones.map(item => item.content).join(',')
     }
     return phones
 }
@@ -123,7 +123,7 @@ async function dealReport(report,index,repeat,e){
                 let name = hash(realname)
                 let content = hash(yzContents)
                 phones = hash(phones)
-                let params = `{"id":"${id}","table":"reports","memberId":"${memberId}","sex":"${sex}","realname":"${cardType}","birthday":"${birthday}","cellphones":"${phones}", "yzContents":"${content}","reportTime":"${time}","cardType":"${cardType}","hash":"${rowHash}"}`
+                let params = `{"id":"${id}","table":"reports","memberId":"${memberId}","sex":"${sex}","realname":"${realname}","birthday":"${birthday}","cellphones":"${phones}", "yzContents":"${content}","reportTime":"${time}","cardType":"${cardType}","hash":"${rowHash}"}`
                 // const params = `${memberId}|${sex}|${hash(realname)}|${birthday}|${hash(phones)}|${hash(yzContents)}|${dayjs(reportTime).format("YYYY-MM-DD HH:mm:ss")}|${names}|${rowHash}`
                 console.log(`previous-${params}`)
                 params = bytes2HexString(params)
