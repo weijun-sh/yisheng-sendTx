@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const reportSchema = new Schema(
   {
+      _id: String,
     id: { type: Number, required: true },
     memberId: { type: Number, required: true },
     yzContents: { type: String, required: true },

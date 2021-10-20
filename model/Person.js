@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const personSchema = new Schema(
   {
+    _id: String,
     id: { type: Number, required: true },
     memberId: { type: String, required: true },
     sex: { type: Number, required: true },

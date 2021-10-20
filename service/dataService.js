@@ -57,7 +57,7 @@ async function tryAgain(callback,repeat){
     return $dfd
 }
 async function parseOrder(order,index,repeat,e){
-    let {id,memberId,orderNo,ctime,items} = order
+    let {_id,id,memberId,orderNo,ctime,items} = order
     console.log(`query person ${memberId}`)
     let person = await Person.findOne({memberId})
     let time = "0";
@@ -100,7 +100,7 @@ async function dealOrders(){
 }
 async function dealReport(report,index,repeat,e){
     const rowHash = calcRowHash(report);
-    let {id,memberId,yzContents,reportTime,hxcode} = report
+    let {_id:id,memberId,yzContents,reportTime,hxcode} = report
     const person = await Person.findOne({memberId})
     let time = "0";
     if(reportTime){
