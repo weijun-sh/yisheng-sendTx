@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const hcCardOrdersSchema = new Schema(
   {
+    _id: String,
     id: { type: Number, required: true },
     memberId: { type: Number, required: true },
     orderNo: { type: String, required: true },

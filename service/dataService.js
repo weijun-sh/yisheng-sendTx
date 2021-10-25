@@ -43,28 +43,40 @@ function parseItems(items){
     }
     return names
 }
+
+function parseItemsCaryType(items){
+    let names = '';
+    if(items) {
+        items = JSON.parse(items)
+        names = items.map(item => item.type).join(',');
+    }
+    return names
+}
 async function tryAgain(callback,repeat){
-    if(repeat>3){
+    console.log(`tryAgain ${repeat}`)
+    if(repeat>=3){
         return
     }
     let $dfd = new Promise((resolve)=>{
         let time = Math.random()*60+30
+        time = time*1000
+        console.log(time)
         setTimeout(async ()=>{
             await callback()
             resolve()
-        },time*1000);
+        },time);
     })
     return $dfd
 }
 async function parseOrder(order,index,repeat,e){
-    let {_id,id,memberId,orderNo,ctime,items} = order
+    let {_id:id,memberId,orderNo,ctime,items} = order
     console.log(`query person ${memberId}`)
     let person = await Person.findOne({memberId})
     let time = "0";
     if(ctime && "null"!=ctime){
         time = dayjs(ctime).format("YYYY-MM-DD HH:mm:ss")
     }
-    let cardType = parseItems(items)
+    let cardType = parseItemsCaryType(items)
     if(person) {
         let {sex, realname, birthday, udeskCustomerInfo} = person
         let phones = parsePhones(udeskCustomerInfo)
@@ -115,7 +127,7 @@ async function dealReport(report,index,repeat,e){
             let order = await HcCardOrders.findOne({orderNo})
             if(order){
                 let {items} = order
-                let cardType = parseItems(items)
+                let cardType = parseItemsCaryType(items)
                 yzContents = yzContents||''
                 let rowHash = `${memberId}${sex}${realname}${birthday}${phones}${yzContents}${cardType}`
                 console.log(`rowHash-${rowHash}`)
@@ -123,22 +135,23 @@ async function dealReport(report,index,repeat,e){
                 let name = hash(realname)
                 let content = hash(yzContents)
                 phones = hash(phones)
-                let params = `{"id":"${id}","table":"reports","memberId":"${memberId}","sex":"${sex}","realname":"${realname}","birthday":"${birthday}","cellphones":"${phones}", "yzContents":"${content}","reportTime":"${time}","cardType":"${cardType}","hash":"${rowHash}"}`
+                let params = `{"id":"${id}","table":"reports","memberId":"${memberId}","sex":"${sex}","realname":"${name}","birthday":"${birthday}","cellphones":"${phones}", "yzContents":"${content}","reportTime":"${time}","cardType":"${cardType}","hash":"${rowHash}"}`
                 // const params = `${memberId}|${sex}|${hash(realname)}|${birthday}|${hash(phones)}|${hash(yzContents)}|${dayjs(reportTime).format("YYYY-MM-DD HH:mm:ss")}|${names}|${rowHash}`
                 console.log(`previous-${params}`)
                 params = bytes2HexString(params)
                 console.log(`after-${params}`)
                 try {
+                    // throw new Error("1121111")
                     let trxHash = await sendTxRepeat(params)
-                    fs.writeFileSync('./write-report.log', `${repeat}-${index}-${trxHash}-${params}-${e||''}\r\n`, {encoding: 'utf8', flag: 'a'}, err => {
+                    fs.writeFileSync('./write-report.log', `${new Date()}-${repeat}-${index}-${trxHash}-${params}-${e||''}\r\n`, {encoding: 'utf8', flag: 'a'}, err => {
                     })
                     console.log(`trx:${trxHash},params:${params}`)
                 }catch (e){
-                    fs.writeFileSync('./write-report.log', `error-${repeat}-${index}-${params}-${e||''}\r\n`, {encoding: 'utf8', flag: 'a'}, err => {
+                    fs.writeFileSync('./write-report.log', `error-${new Date()}-${repeat}-${index}-${params}-${e||''}\r\n`, {encoding: 'utf8', flag: 'a'}, err => {
                     })
                     await tryAgain(()=>{
                         dealReport(report,index,++repeat,e)
-                    },report)
+                    },repeat)
                 }
             }
         }

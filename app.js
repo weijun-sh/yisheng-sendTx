@@ -6,7 +6,7 @@ const con = mongoose.connection;
 con.on('error', console.error.bind(console, '连接数据库失败'));
 con.once('open',async ()=>{
     console.log("connect success")
-    // await dealOrders()
+    await dealOrders()
     await dealReports()
     //成功连接
 })
